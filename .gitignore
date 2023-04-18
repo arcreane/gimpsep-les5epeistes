@@ -1,2 +1,2 @@
-build
-vendor/opencv
+cmake-build-debug
+.idea

@@ -39,4 +39,12 @@ include_directories(${OpenCV_INCLUDE_DIRS} vendor/glfw/include ${IMGUI_HEADERS})
 link_directories(${OpenCV_LIB_DIR})
 link_libraries(${OpenCV_LIBS} imgui glfw ${OPENGL_LIBRARIES})
 
-add_executable(main "src/main.cpp")
+
+# Assets config
+file(COPY assets DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/bin/Debug)
+file(COPY assets DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/bin/Release)
+# Executable config
+
+file(GLOB_RECURSE SOURCES "src/*.cpp")
+file(GLOB_RECURSE HEADERS "src/*.hpp")
+add_executable(main ${SOURCES} ${HEADERS})

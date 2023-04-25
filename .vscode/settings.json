@@ -1,6 +1,10 @@
 {
 	"C_Cpp.default.configurationProvider": "go2sh.cmake-integration",
 	"files.associations": {
-		"iostream": "cpp"
+		"iostream": "cpp",
+		"forward_list": "cpp",
+		"list": "cpp",
+		"xhash": "cpp",
+		"*.inc": "cpp"
 	}
 }

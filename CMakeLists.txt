@@ -21,15 +21,17 @@ add_subdirectory(vendor/glfw)
 file(GLOB IMGUI_SOURCES 
 	vendor/imgui/*.cpp 
 	vendor/imgui/backends/imgui_impl_glfw.cpp 
-	vendor/imgui/backends/imgui_impl_opengl3.cpp)
+	vendor/imgui/backends/imgui_impl_opengl3.cpp
+	vendor/imgui_file_dialog/ImGuiFileDialog.cpp)
 
 file(GLOB IMGUI_HEADERS 
 	vendor/imgui/*.h 
 	vendor/imgui/backends/imgui_impl_glfw.h
-	vendor/imgui/backends/imgui_impl_opengl3.h)
+	vendor/imgui/backends/imgui_impl_opengl3.h
+	vendor/imgui_file_dialog/ImGuiFileDialog.h)
 
 add_library(imgui STATIC ${IMGUI_SOURCES})
-target_include_directories(imgui PUBLIC vendor/imgui vendor/imgui/backends)
+target_include_directories(imgui PUBLIC vendor/imgui vendor/imgui/backends vendor/imgui_file_dialog)
 target_link_libraries(imgui PUBLIC glfw)
 
 # OpenGL impl package

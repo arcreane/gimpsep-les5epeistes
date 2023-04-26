@@ -2,7 +2,10 @@
 
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
-#include <stdio.h>
+#include "ImGuiFileDialog.h"
+
+#include <cstdio>
+#include <string>
 
 static void glfw_error_callback(int error, const char *description)
 {
@@ -31,10 +34,10 @@ Application::Application()
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO &io = ImGui::GetIO();
-	(void)io;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
-
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 	// Setup Dear ImGui style
 	ImGui::StyleColorsDark();
 	// ImGui::StyleColorsLight();
@@ -73,8 +76,9 @@ void Application::run()
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		update();
 		// Rendering
+		update();
+		render_img();
 		render();
 	}
 }
@@ -98,8 +102,22 @@ void Application::update()
 		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);			   // Edit 1 float using a slider from 0.0f to 1.0f
 		ImGui::ColorEdit3("clear color", (float *)&m_clear_color); // Edit 3 floats representing a color
 
-		if (ImGui::Button("Button")) // Buttons return true when clicked (most widgets return true when edited/activated)
+		if (ImGui::Button("Button"))
+		{ // Buttons return true when clicked (most widgets return true when edited/activated)
+			ImGuiFileDialog::Instance()->OpenDialog(
+				"ChooseFileDlgKey",
+				"Choose an image",
+				"Image files (.bmp *.dib *.jpeg *.jpg *.jpe *.jp2 *.png *.webp *.pbm *.pgm *.ppm *.pxm *.pnm *.sr *.ras *.tiff *.tif){.bmp,.dib,.jpeg,.jpg,.jpe,.jp2,.png,.webp,.pbm,.pgm,.ppm,.pxm,.pnm,.sr,.ras,.tiff,.tif}",
+				"/");
 			counter++;
+		}
+
+		img_picker();
+
+		static int i = 0;
+		static std::string path = "C:\\Users\\prevo\\source\\cours\\multimedia\\imgimp\\assets\\img\\grayfish.jpg";
+		if (i == 0)
+			load_file(path);
 		ImGui::SameLine();
 		ImGui::Text("counter = %d", counter);
 
@@ -109,6 +127,100 @@ void Application::update()
 	}
 }
 
+void Application::img_picker()
+{
+	if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey"))
+	{
+		// action if OK
+		if (ImGuiFileDialog::Instance()->IsOk())
+		{
+			std::string path = ImGuiFileDialog::Instance()->GetFilePathName();
+			load_file(path);
+			ImGuiFileDialog::Instance()->Close();
+		}
+		ImGuiFileDialog::Instance()->Close();
+	}
+}
+void Application::load_file(std::string &path)
+{
+	m_img = cv::imread(path);
+
+	// Convert the image to RGB
+	cv::cvtColor(m_img, m_img, cv::COLOR_BGR2RGB);
+	if (m_img.empty())
+	{
+		show_popup("Error", "Could not load image");
+	}
+	glDeleteTextures(1, &m_texture_id);
+
+	load_texture();
+}
+
+void Application::load_texture()
+{
+
+	glEnable(GL_TEXTURE_2D);
+	// glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	glGenTextures(1, &m_texture_id);
+	glBindTexture(GL_TEXTURE_2D, m_texture_id);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	// Set texture clamping method
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+
+	glTexImage2D(GL_TEXTURE_2D,	   // Type of texture
+				 0,				   // Pyramid level (for mip-mapping) - 0 is the top level
+				 GL_RGB,		   // Internal colour format to convert to
+				 m_img.cols,	   // Image width  i.e. 640 for Kinect in standard mode
+				 m_img.rows,	   // Image height i.e. 480 for Kinect in standard mode
+				 0,				   // Border width in pixels (can either be 1 or 0)
+				 GL_RGB,		   // Input image format (i.e. GL_RGB, GL_RGBA, GL_BGR etc.)
+				 GL_UNSIGNED_BYTE, // Image data type
+				 m_img.ptr());	   // The actual image data itself
+}
+void Application::show_popup(std::string title, std::string message)
+{
+	static bool show_popup = true;
+	ImGui::OpenPopup(title.c_str());
+	if (show_popup)
+	{
+		ImGui::BeginPopupModal(title.c_str(), &show_popup, ImGuiWindowFlags_AlwaysAutoResize);
+		ImGui::Text(message.c_str());
+		ImGui::Separator();
+
+		if (ImGui::Button("OK", ImVec2(120, 0)))
+		{
+			show_popup = false;
+		}
+		ImGui::EndPopup();
+	}
+}
+
+void Application::render_img()
+{
+	ImGuiIO &io = ImGui::GetIO();
+	ImGui::SetNextWindowSize(io.DisplaySize);
+	ImGui::SetNextWindowPos(ImGui::GetMainViewport()->Pos);
+	ImGui::SetNextWindowViewport(ImGui::GetMainViewport()->ID);
+	ImGui::Begin("Image", NULL, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+
+	// Create a texture for the image
+	if (!m_img.empty())
+	{
+		// Computing viewport in order to center image and keep aspect ratio
+		float img_aspect_ratio = m_img.cols / (float)m_img.rows;
+		float viewport_aspect_ratio = io.DisplaySize.x / io.DisplaySize.y;
+		float scale = img_aspect_ratio > viewport_aspect_ratio ? io.DisplaySize.x / m_img.cols : io.DisplaySize.y / m_img.rows;
+
+		ImGui::Image((void *)(intptr_t)m_texture_id, ImVec2((float)m_img.cols, (float)m_img.rows));
+	}
+
+	ImGui::End();
+}
 void Application::render()
 {
 	ImGui::Render();
@@ -116,8 +228,12 @@ void Application::render()
 	glfwGetFramebufferSize(m_window, &display_w, &display_h);
 	glViewport(0, 0, display_w, display_h);
 	glClearColor(m_clear_color.x * m_clear_color.w, m_clear_color.y * m_clear_color.w, m_clear_color.z * m_clear_color.w, m_clear_color.w);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClearDepth(0.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	ImGui::UpdatePlatformWindows();
+	ImGui::RenderPlatformWindowsDefault();
 
 	glfwSwapBuffers(m_window);
 }

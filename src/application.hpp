@@ -7,10 +7,10 @@
 #include <memory>
 #include <vector>
 #include <opencv2/opencv.hpp>
-#include "module.hpp"
+#include "modules/module.hpp"
 
 // Modules
-#include "modules/real_module.hpp"
+#include "modules/test_module.hpp"
 
 class Application
 {
@@ -21,14 +21,11 @@ public:
 
 private:
 	void update();
-
-	void render_img();
 	void render();
 
-	void img_picker();
-	void load_file(std::string &path);
-	void load_texture();
 	void show_popup(std::string title, std::string message);
+
+	void update_img(cv::Mat &img);
 
 private:
 	GLFWwindow *m_window;
@@ -39,7 +36,12 @@ private:
 
 	unsigned int m_texture_id = 2;
 
+	// clang-format off
+
+	// List of modules with a callback to update the image
 	std::array<std::unique_ptr<Module>, 1> m_modules = {
-		std::make_unique<RealModule>()
+		std::make_unique<TestModule>([this] (cv::Mat &img) { this->update_img(img); })
 	};
+	// clang-format on
+	
 };

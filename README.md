@@ -4,4 +4,4 @@
 
 * `git clone --recurse-submodules` to clone the repo and all its dependencies
 * Copy-Paste the opencv folder for your OS in vendor
-* Build with cmake (ask for help if needed)
+* Build with cmake

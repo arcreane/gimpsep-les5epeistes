@@ -4,10 +4,16 @@
 #include "imgui.h"
 
 #include <string>
+#include <memory>
+#include <vector>
 #include <opencv2/opencv.hpp>
+#include "module.hpp"
 
+// Modules
+#include "modules/real_module.hpp"
 
-class Application {
+class Application
+{
 public:
 	Application();
 	~Application();
@@ -31,5 +37,9 @@ private:
 	// This image should always be in BGR format
 	cv::Mat m_img;
 
-	unsigned int m_texture_id = 1;
+	unsigned int m_texture_id = 2;
+
+	std::array<std::unique_ptr<Module>, 1> m_modules = {
+		std::make_unique<RealModule>()
+	};
 };

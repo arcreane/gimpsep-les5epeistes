@@ -36,8 +36,6 @@ Application::Application()
 	ImGuiIO &io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 	// Setup Dear ImGui style
 	ImGui::StyleColorsDark();
 	// ImGui::StyleColorsLight();
@@ -90,6 +88,10 @@ void Application::update()
 	// if (show_demo_window)
 	// 	ImGui::ShowDemoWindow(&show_demo_window);
 
+	for (auto &module : m_modules)
+	{
+		module->update();
+	}
 	// 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
 	{
 		static float f = 0.0f;
@@ -115,9 +117,6 @@ void Application::update()
 		img_picker();
 
 		static int i = 0;
-		static std::string path = "C:\\Users\\prevo\\source\\cours\\multimedia\\imgimp\\assets\\img\\grayfish.jpg";
-		if (i == 0)
-			load_file(path);
 		ImGui::SameLine();
 		ImGui::Text("counter = %d", counter);
 
@@ -205,7 +204,6 @@ void Application::render_img()
 	ImGuiIO &io = ImGui::GetIO();
 	ImGui::SetNextWindowSize(io.DisplaySize);
 	ImGui::SetNextWindowPos(ImGui::GetMainViewport()->Pos);
-	ImGui::SetNextWindowViewport(ImGui::GetMainViewport()->ID);
 	ImGui::Begin("Image", NULL, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 
 	// Create a texture for the image
@@ -232,8 +230,6 @@ void Application::render()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-	ImGui::UpdatePlatformWindows();
-	ImGui::RenderPlatformWindowsDefault();
 
 	glfwSwapBuffers(m_window);
 }

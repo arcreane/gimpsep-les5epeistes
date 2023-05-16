@@ -49,4 +49,8 @@ file(COPY assets DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/bin/Release)
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 file(GLOB_RECURSE HEADERS "src/*.hpp")
+
+# print runtime output directory
+message(STATUS "Runtime output directory: ${EXECUTABLE_OUTPUT_PATH}")
+
 add_executable(main ${SOURCES} ${HEADERS})

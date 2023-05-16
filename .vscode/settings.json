@@ -75,6 +75,13 @@
 		"array": "cpp",
 		"complex": "cpp",
 		"deque": "cpp",
-		"queue": "cpp"
+		"queue": "cpp",
+		"condition_variable": "cpp",
+		"cstdarg": "cpp",
+		"filesystem": "cpp",
+		"future": "cpp",
+		"numeric": "cpp",
+		"typeindex": "cpp",
+		"unordered_set": "cpp"
 	}
 }

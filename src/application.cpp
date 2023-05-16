@@ -29,6 +29,7 @@ Application::Application()
 		return;
 	glfwMakeContextCurrent(m_window);
 	glfwSwapInterval(1); // Enable vsync
+	glfwMaximizeWindow(m_window);
 
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
@@ -76,7 +77,6 @@ void Application::run()
 
 		// Rendering
 		update();
-		render_img();
 		render();
 	}
 }
@@ -84,79 +84,92 @@ void Application::run()
 void Application::update()
 {
 
-	// // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-	// if (show_demo_window)
-	// 	ImGui::ShowDemoWindow(&show_demo_window);
+	ImGui::ShowDemoWindow();
 
-	for (auto &module : m_modules)
+	// defining img window
 	{
-		module->update();
-	}
-	// 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
-	{
-		static float f = 0.0f;
-		static int counter = 0;
+		ImGuiIO &io = ImGui::GetIO();
+		ImGui::SetNextWindowSize(io.DisplaySize);
+		ImGui::SetNextWindowPos(ImGui::GetMainViewport()->Pos);
+		ImGui::Begin("Image", NULL, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 
-		ImGui::Begin("Hello, world!"); // Create a window called "Hello, world!" and append into it.
-
-		ImGui::Text("This is some useful text."); // Display some text (you can use a format strings too)
-
-		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);			   // Edit 1 float using a slider from 0.0f to 1.0f
-		ImGui::ColorEdit3("clear color", (float *)&m_clear_color); // Edit 3 floats representing a color
-
-		if (ImGui::Button("Button"))
-		{ // Buttons return true when clicked (most widgets return true when edited/activated)
+		if (ImGui::MenuItem("Open an image", "Ctrl+O", true, true))
+		{
 			ImGuiFileDialog::Instance()->OpenDialog(
-				"ChooseFileDlgKey",
+				"ImgPicker",
 				"Choose an image",
 				"Image files (.bmp *.dib *.jpeg *.jpg *.jpe *.jp2 *.png *.webp *.pbm *.pgm *.ppm *.pxm *.pnm *.sr *.ras *.tiff *.tif){.bmp,.dib,.jpeg,.jpg,.jpe,.jp2,.png,.webp,.pbm,.pgm,.ppm,.pxm,.pnm,.sr,.ras,.tiff,.tif}",
 				"/");
-			counter++;
+		}
+		if (!m_img.empty())
+		{
+			// Computing viewport in order to center image and keep aspect ratio
+			float img_aspect_ratio = m_img.cols / (float)m_img.rows;
+			float viewport_aspect_ratio = io.DisplaySize.x / io.DisplaySize.y;
+			float scale = img_aspect_ratio > viewport_aspect_ratio ? io.DisplaySize.x / m_img.cols : io.DisplaySize.y / m_img.rows;
+
+			ImGui::Image((void *)(intptr_t)m_texture_id, ImVec2((float)m_img.cols, (float)m_img.rows));
 		}
 
-		img_picker();
-
-		static int i = 0;
-		ImGui::SameLine();
-		ImGui::Text("counter = %d", counter);
-
-		ImGuiIO &io = ImGui::GetIO();
-		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 		ImGui::End();
 	}
-}
 
-void Application::img_picker()
-{
-	if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey"))
+	// defining img picker
 	{
-		// action if OK
-		if (ImGuiFileDialog::Instance()->IsOk())
+		if (ImGuiFileDialog::Instance()->Display("ImgPicker"))
 		{
-			std::string path = ImGuiFileDialog::Instance()->GetFilePathName();
-			load_file(path);
+			// action if OK
+			if (ImGuiFileDialog::Instance()->IsOk())
+			{
+				std::string path = ImGuiFileDialog::Instance()->GetFilePathName();
+				cv::Mat img = cv::imread(path);
+				if (img.empty())
+				{
+					show_popup("Error", "Could not load image");
+				}
+				else
+				{
+					update_img(img);
+				}
+				ImGuiFileDialog::Instance()->Close();
+			}
 			ImGuiFileDialog::Instance()->Close();
 		}
-		ImGuiFileDialog::Instance()->Close();
 	}
-}
-void Application::load_file(std::string &path)
-{
-	m_img = cv::imread(path);
-
-	// Convert the image to RGB
-	cv::cvtColor(m_img, m_img, cv::COLOR_BGR2RGB);
-	if (m_img.empty())
+	if (!m_img.empty())
 	{
-		show_popup("Error", "Could not load image");
+		// Defining module windows
+		for (auto &module : m_modules)
+		{
+			module->update();
+		}
 	}
-	glDeleteTextures(1, &m_texture_id);
-
-	load_texture();
 }
 
-void Application::load_texture()
+void Application::show_popup(std::string title, std::string message)
 {
+	static bool show_popup = true;
+	ImGui::OpenPopup(title.c_str());
+	if (show_popup)
+	{
+		ImGui::BeginPopupModal(title.c_str(), &show_popup, ImGuiWindowFlags_AlwaysAutoResize);
+		ImGui::Text(message.c_str());
+		ImGui::Separator();
+
+		if (ImGui::Button("OK", ImVec2(120, 0)))
+		{
+			show_popup = false;
+		}
+		ImGui::EndPopup();
+	}
+}
+
+void Application::update_img(cv::Mat &img)
+{
+	cv::cvtColor(img, img, cv::COLOR_BGR2RGB);
+	m_img = img.clone();
+
+	glDeleteTextures(1, &m_texture_id);
 
 	glEnable(GL_TEXTURE_2D);
 	// glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -181,44 +194,7 @@ void Application::load_texture()
 				 GL_UNSIGNED_BYTE, // Image data type
 				 m_img.ptr());	   // The actual image data itself
 }
-void Application::show_popup(std::string title, std::string message)
-{
-	static bool show_popup = true;
-	ImGui::OpenPopup(title.c_str());
-	if (show_popup)
-	{
-		ImGui::BeginPopupModal(title.c_str(), &show_popup, ImGuiWindowFlags_AlwaysAutoResize);
-		ImGui::Text(message.c_str());
-		ImGui::Separator();
 
-		if (ImGui::Button("OK", ImVec2(120, 0)))
-		{
-			show_popup = false;
-		}
-		ImGui::EndPopup();
-	}
-}
-
-void Application::render_img()
-{
-	ImGuiIO &io = ImGui::GetIO();
-	ImGui::SetNextWindowSize(io.DisplaySize);
-	ImGui::SetNextWindowPos(ImGui::GetMainViewport()->Pos);
-	ImGui::Begin("Image", NULL, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
-
-	// Create a texture for the image
-	if (!m_img.empty())
-	{
-		// Computing viewport in order to center image and keep aspect ratio
-		float img_aspect_ratio = m_img.cols / (float)m_img.rows;
-		float viewport_aspect_ratio = io.DisplaySize.x / io.DisplaySize.y;
-		float scale = img_aspect_ratio > viewport_aspect_ratio ? io.DisplaySize.x / m_img.cols : io.DisplaySize.y / m_img.rows;
-
-		ImGui::Image((void *)(intptr_t)m_texture_id, ImVec2((float)m_img.cols, (float)m_img.rows));
-	}
-
-	ImGui::End();
-}
 void Application::render()
 {
 	ImGui::Render();

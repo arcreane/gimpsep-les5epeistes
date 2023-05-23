@@ -36,7 +36,7 @@ private:
 
 	unsigned int m_texture_id = 2;
 
-	// std::vector<cv::Mat> m_img_history{};
+	std::vector<cv::Mat> m_img_history{};
 
 	// clang-format off
 

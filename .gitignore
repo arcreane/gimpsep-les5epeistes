@@ -2,3 +2,5 @@ build
 vendor/opencv
 cmake-build-debug
 .idea
+.vs
+CMakeLists.txt

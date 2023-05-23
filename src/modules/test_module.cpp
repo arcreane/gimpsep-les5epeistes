@@ -25,7 +25,8 @@ void TestModule::update()
 		auto status = m_future.wait_for(std::chrono::milliseconds(0));
 		if (status == std::future_status::ready)
 		{
-			m_update_img(m_future.get());
+            cv::Mat result = m_future.get();
+            m_update_img(result);
 		} else {
 			ImGui::Text("Computing...");
 		}

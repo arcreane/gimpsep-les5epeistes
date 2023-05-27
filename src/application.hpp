@@ -36,12 +36,13 @@ private:
 
 	unsigned int m_texture_id = 2;
 
+	// std::vector<cv::Mat> m_img_history{};
+
 	// clang-format off
 
 	// List of modules with a callback to update the image
 	std::array<std::unique_ptr<Module>, 1> m_modules = {
-		std::make_unique<TestModule>([this] (cv::Mat &img) { this->update_img(img); })
+		std::make_unique<TestModule>(&m_img, [this] (cv::Mat &img) { this->update_img(img); })
 	};
 	// clang-format on
-	
 };

@@ -1,12 +1,19 @@
 #pragma once
 #include "module.hpp"
 
-class CannnyEdgeModule : public Module
+#include <future>
+#include <thread>
+
+class CannyEdgeModule : public Module
 {
 
 	// Inherit the constructors of Module (they are not inherited automatically)
 	using Module::Module;
 
 public:
-	void update() override;
+    void update() override;
+
+private:
+    // Future to compute heavy stuff in another thread
+    std::future<cv::Mat> m_future;
 };

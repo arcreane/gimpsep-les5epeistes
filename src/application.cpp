@@ -84,8 +84,6 @@ void Application::run()
 void Application::update()
 {
 
-	ImGui::ShowDemoWindow();
-
 	// defining img window
 	{
 		ImGuiIO &io = ImGui::GetIO();

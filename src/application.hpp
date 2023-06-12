@@ -11,6 +11,7 @@
 
 // Modules
 #include "modules/test_module.hpp"
+#include "modules/canny_edge_module.hpp"
 
 class Application
 {
@@ -36,13 +37,14 @@ private:
 
 	unsigned int m_texture_id = 2;
 
-	// std::vector<cv::Mat> m_img_history{};
+	std::vector<cv::Mat> m_img_history{};
 
 	// clang-format off
 
 	// List of modules with a callback to update the image
-	std::array<std::unique_ptr<Module>, 1> m_modules = {
-		std::make_unique<TestModule>(&m_img, [this] (cv::Mat &img) { this->update_img(img); })
+	std::array<std::unique_ptr<Module>, 2> m_modules = {
+		std::make_unique<TestModule>(&m_img, [this] (cv::Mat &img) { this->update_img(img); }),
+        std::make_unique<CannyEdgeModule>(&m_img, [this] (cv::Mat &img) { this->update_img(img); })
 	};
 	// clang-format on
 };

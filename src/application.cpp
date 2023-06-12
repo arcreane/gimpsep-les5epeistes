@@ -101,6 +101,10 @@ void Application::update()
 				"Image files (.bmp *.dib *.jpeg *.jpg *.jpe *.jp2 *.png *.webp *.pbm *.pgm *.ppm *.pxm *.pnm *.sr *.ras *.tiff *.tif){.bmp,.dib,.jpeg,.jpg,.jpe,.jp2,.png,.webp,.pbm,.pgm,.ppm,.pxm,.pnm,.sr,.ras,.tiff,.tif}",
 				"/");
 		}
+		if (ImGui::MenuItem("Undo", "Ctrl+Z", true, m_img_history.size() > 0 && !m_img.empty()))
+		{
+			//TODO: faire l'historique
+		}
 		if (!m_img.empty())
 		{
 			// Computing viewport in order to center image and keep aspect ratio
@@ -166,6 +170,12 @@ void Application::show_popup(std::string title, std::string message)
 
 void Application::update_img(cv::Mat &img)
 {
+	if (m_img.empty()) {
+		m_img_history.push_back(m_img.clone());
+		if (m_img_history.size() > 10) {
+			m_img_history.erase(m_img_history.begin());
+		}
+	}
 	cv::cvtColor(img, img, cv::COLOR_BGR2RGB);
 	m_img = img.clone();
 

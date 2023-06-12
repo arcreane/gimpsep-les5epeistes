@@ -8,10 +8,10 @@ set(OpenCV_DIR vendor/opencv/build)
 
 # OpenCV package
 find_package(OpenCV REQUIRED)
-configure_file("${_OpenCV_LIB_PATH}/opencv_world470d.dll" "${CMAKE_CURRENT_BINARY_DIR}/bin/Debug" COPYONLY)
-configure_file("${_OpenCV_LIB_PATH}/opencv_world470d.dll" "${CMAKE_CURRENT_BINARY_DIR}/bin/Release" COPYONLY)
-configure_file("${_OpenCV_LIB_PATH}/opencv_world470.dll" "${CMAKE_CURRENT_BINARY_DIR}/bin/Debug" COPYONLY)
-configure_file("${_OpenCV_LIB_PATH}/opencv_world470.dll" "${CMAKE_CURRENT_BINARY_DIR}/bin/Release" COPYONLY)
+configure_file("${_OpenCV_LIB_PATH}/opencv_world470d.dll" "${CMAKE_CURRENT_BINARY_DIR}/Debug" COPYONLY)
+configure_file("${_OpenCV_LIB_PATH}/opencv_world470d.dll" "${CMAKE_CURRENT_BINARY_DIR}/Release" COPYONLY)
+configure_file("${_OpenCV_LIB_PATH}/opencv_world470.dll" "${CMAKE_CURRENT_BINARY_DIR}/Debug" COPYONLY)
+configure_file("${_OpenCV_LIB_PATH}/opencv_world470.dll" "${CMAKE_CURRENT_BINARY_DIR}/Release" COPYONLY)
 
 # glfw package
 add_subdirectory(vendor/glfw)

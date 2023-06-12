@@ -47,7 +47,7 @@ private:
 	// clang-format off
 
     // List of modules with a callback to update the image
-    std::array<std::unique_ptr<Module>, 6> m_modules = {
+    std::array<std::unique_ptr<Module>, 7> m_modules = {
             std::make_unique<CannyEdgeModule>(&m_img, [this] (cv::Mat &img) { this->update_img(img); }),
             std::make_unique<ResizeModule>(&m_img, [this] (cv::Mat &img) { this->update_img(img); }),
             std::make_unique<CropModule>(&m_img, [this] (cv::Mat &img) { this->update_img(img); }),

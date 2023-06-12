@@ -43,8 +43,8 @@ link_libraries(${OpenCV_LIBS} imgui glfw ${OPENGL_LIBRARIES})
 
 
 # Assets config
-file(COPY assets DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/bin/Debug)
-file(COPY assets DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/bin/Release)
+file(COPY assets DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Debug)
+file(COPY assets DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Release)
 # Executable config
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")

@@ -10,7 +10,7 @@
 #include "modules/module.hpp"
 
 // Modules
-#include "modules/test_module.hpp"
+    #include "modules/test_module.hpp"
 #include "modules/canny_edge_module.hpp"
 #include "modules/resize_module.hpp"
 
@@ -42,11 +42,14 @@ private:
 
 	// clang-format off
 
-	// List of modules with a callback to update the image
-	std::array<std::unique_ptr<Module>, 3> m_modules = {
-		std::make_unique<TestModule>(&m_img, [this] (cv::Mat &img) { this->update_img(img); }),
-        std::make_unique<CannyEdgeModule>(&m_img, [this] (cv::Mat &img) { this->update_img(img); }),
-		std::make_unique<ResizeModule>(&m_img, [this] (cv::Mat &img) { this->update_img(img); })
-	};
+    // List of modules with a callback to update the image
+    std::array<std::unique_ptr<Module>, 6> m_modules = {
+            std::make_unique<TestModule>(&m_img, [this] (cv::Mat &img) { this->update_img(img); }),
+            std::make_unique<CannyEdgeModule>(&m_img, [this] (cv::Mat &img) { this->update_img(img); }),
+            std::make_unique<ResizeModule>(&m_img, [this] (cv::Mat &img) { this->update_img(img); }),
+            std::make_unique<CropModule>(&m_img, [this] (cv::Mat &img) { this->update_img(img); }),
+            std::make_unique<DilatationModule>(&m_img, [this] (cv::Mat &img) { this->update_img(img); }),
+            std::make_unique<ErosionModule>(&m_img, [this] (cv::Mat &img) { this->update_img(img); }),
+    };
 	// clang-format on
 };

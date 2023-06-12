@@ -16,6 +16,7 @@
 #include "modules/dilatation_module.hpp"
 #include "modules/erosion_module.hpp"
 #include "modules/light_dark_module.hpp"
+#include "modules/stitching_module.hpp"
 
 class Application
 {
@@ -53,6 +54,7 @@ private:
             std::make_unique<DilatationModule>(&m_img, [this] (cv::Mat &img) { this->update_img(img); }),
             std::make_unique<ErosionModule>(&m_img, [this] (cv::Mat &img) { this->update_img(img); }),
             std::make_unique<LightDarkModule>(&m_img, [this] (cv::Mat &img) { this->update_img(img); }),
+            std::make_unique<StitchingModule>(&m_img, [this] (cv::Mat &img) { this->update_img(img); }),
     };
 	// clang-format on
 };

@@ -105,6 +105,14 @@ void Application::update()
 		{
 			//TODO: faire l'historique
 		}
+		if (ImGui::MenuItem("Save", "Ctrl+S", true, !m_img.empty()))
+		{
+			ImGuiFileDialog::Instance()->OpenDialog(
+				"ImgSavePicker",
+				"Choose an image",
+				"Image files (.bmp *.dib *.jpeg *.jpg *.jpe *.jp2 *.png *.webp *.pbm *.pgm *.ppm *.pxm *.pnm *.sr *.ras *.tiff *.tif){.bmp,.dib,.jpeg,.jpg,.jpe,.jp2,.png,.webp,.pbm,.pgm,.ppm,.pxm,.pnm,.sr,.ras,.tiff,.tif}",
+				"/");
+		}
 		if (!m_img.empty())
 		{
 			// Computing viewport in order to center image and keep aspect ratio
@@ -140,6 +148,22 @@ void Application::update()
 			ImGuiFileDialog::Instance()->Close();
 		}
 	}
+
+	// defining img saver
+	{
+		if (ImGuiFileDialog::Instance()->Display("ImgSavePicker"))
+		{
+			// action if OK
+			if (ImGuiFileDialog::Instance()->IsOk())
+			{
+				std::string path = ImGuiFileDialog::Instance()->GetFilePathName();
+				cv::imwrite(path, m_img);
+				ImGuiFileDialog::Instance()->Close();
+			}
+			ImGuiFileDialog::Instance()->Close();
+		}
+	}
+
 	if (!m_img.empty())
 	{
 		// Defining module windows

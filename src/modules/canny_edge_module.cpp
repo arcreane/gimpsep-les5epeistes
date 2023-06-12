@@ -6,11 +6,32 @@
 
 void CannyEdgeModule::update()
 {
+    static int t1 = 100;
+    static int t2 = 350;
+
     // Create a window
     ImGui::Begin("Canny edge module");
 
+    ImGui::BeginGroup();
+    ImGui::PushItemWidth(120);
+    ImGui::InputInt("#", &t1, 0, 500);
+    ImGui::PopItemWidth();
+    ImGui::SameLine();
+    ImGui::SliderInt("Threshold 1", &t1, 0, 500);
+    ImGui::EndGroup();
+
+    ImGui::BeginGroup();
+    ImGui::PushItemWidth(120);
+    ImGui::InputInt("##", &t2, 0, 350);
+    ImGui::PopItemWidth();
+    ImGui::SameLine();
+    ImGui::SliderInt("Threshold 2", &t2, 0, 350);
+    ImGui::EndGroup();
+
+    ImGui::Spacing();
+
     // Add a button
-    if (ImGui::Button("This button will display canny edges !"))
+    if (ImGui::Button("Display canny edges"))
     {
         // Heavy computation on another thread (e.g. performing openCV operations)
         m_future = std::async(std::launch::async, [this]
@@ -18,7 +39,7 @@ void CannyEdgeModule::update()
             cv::Mat gray_image, image, edges;
             image = this->m_current_img->clone();
             cv::cvtColor(image, gray_image, cv::COLOR_BGR2GRAY);
-            cv::Canny(image, edges, 100, 350, 3, false);
+            cv::Canny(image, edges, t1, t2, 3, false);
             return edges; });
     }
 
@@ -30,8 +51,6 @@ void CannyEdgeModule::update()
         {
             cv::Mat result = m_future.get();
             m_update_img(result);
-        } else {
-            ImGui::Text("Computing...");
         }
     }
 

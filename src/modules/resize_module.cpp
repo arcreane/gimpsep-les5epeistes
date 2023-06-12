@@ -72,10 +72,3 @@ void ResizeModule::update()
 	// End the window
 	ImGui::End();
 }
-
-void ResizeModule::resize_img(int w, int h)
-{
-	cv::Mat dest;
-	cv::resize(*m_current_img, dest, cv::Size(w, h));
-	m_update_img(dest);
-}

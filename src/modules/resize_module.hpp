@@ -12,7 +12,6 @@ class ResizeModule : public Module
 
 public:
 	void update() override;
-	void resize_img(int, int);
 private:
 	// Future to compute heavy stuff in another thread
 	std::future<cv::Mat> m_future;

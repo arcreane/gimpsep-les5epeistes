@@ -30,7 +30,7 @@ file(GLOB IMGUI_HEADERS
 	vendor/imgui/backends/imgui_impl_opengl3.h
 	vendor/imgui_file_dialog/ImGuiFileDialog.h)
 
-add_library(imgui STATIC ${IMGUI_SOURCES} src/modules/dilate_erosion_module.cpp src/modules/erosion_module.hpp src/modules/erosion_module.hpp src/modules/dilatation_module.hpp src/modules/dilatation_module.cpp src/modules/dilatation_module.cpp src/modules/dilatation_module.cpp)
+add_library(imgui STATIC ${IMGUI_SOURCES})
 target_include_directories(imgui PUBLIC vendor/imgui vendor/imgui/backends vendor/imgui_file_dialog)
 target_link_libraries(imgui PUBLIC glfw)
 

@@ -12,10 +12,10 @@ void CropModule::update()
 	static int x = 0;
 	static int y = 0;
 
-	if (w > m_current_img->cols)
-		w = m_current_img->cols;
-	if (h > m_current_img->rows)
-		h = m_current_img->rows;
+	if (w > m_current_img->cols - x)
+		w = m_current_img->cols - x;
+	if (h > m_current_img->rows - y)
+		h = m_current_img->rows - y;
 	if (x > m_current_img->cols)
 		x = m_current_img->cols;
 	if (y > m_current_img->rows)

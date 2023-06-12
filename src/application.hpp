@@ -15,6 +15,8 @@
 #include "modules/crop_module.hpp"
 #include "modules/dilatation_module.hpp"
 #include "modules/erosion_module.hpp"
+#include "modules/light_dark_module.hpp"
+
 class Application
 {
 public:
@@ -44,12 +46,13 @@ private:
 	// clang-format off
 
     // List of modules with a callback to update the image
-    std::array<std::unique_ptr<Module>, 5> m_modules = {
+    std::array<std::unique_ptr<Module>, 6> m_modules = {
             std::make_unique<CannyEdgeModule>(&m_img, [this] (cv::Mat &img) { this->update_img(img); }),
             std::make_unique<ResizeModule>(&m_img, [this] (cv::Mat &img) { this->update_img(img); }),
             std::make_unique<CropModule>(&m_img, [this] (cv::Mat &img) { this->update_img(img); }),
             std::make_unique<DilatationModule>(&m_img, [this] (cv::Mat &img) { this->update_img(img); }),
             std::make_unique<ErosionModule>(&m_img, [this] (cv::Mat &img) { this->update_img(img); }),
+            std::make_unique<LightDarkModule>(&m_img, [this] (cv::Mat &img) { this->update_img(img); }),
     };
 	// clang-format on
 };

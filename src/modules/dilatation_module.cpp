@@ -70,7 +70,7 @@ void DilatationModule::update()
 
     ImGui::Spacing();
 
-    if (ImGui::Button("Erosion !"))
+    if (ImGui::Button("Dilatation !"))
     {
         // Heavy computation on another thread (e.g. performing openCV operations)
         m_future = std::async(std::launch::async, [this]
